@@ -1,0 +1,53 @@
+pipeline {
+    agent any
+
+    stages {
+
+        stage('Clone Repository') {
+            steps {
+                git branch: 'main',
+                    url: 'https://github.com/YOUR-USERNAME/YOUR-REPO-NAME.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                echo 'No build required for static HTML site'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                echo 'Checking if index.html exists...'
+                script {
+                    if (!fileExists('index.html')) {
+                        error "index.html not found! Build failed."
+                    }
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo 'Deploying website...'
+                
+                // Windows example (change path as needed)
+                bat '''
+                xcopy /E /Y * C:\\xampp\\htdocs\\portfolio\\
+                '''
+                
+                // For Linux use this instead:
+                // sh 'cp -r * /var/www/html/portfolio/'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed!'
+        }
+    }
+}
